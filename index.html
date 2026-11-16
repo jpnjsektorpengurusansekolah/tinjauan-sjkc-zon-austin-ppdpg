@@ -480,4 +480,91 @@
         document.getElementById("recTarikh").textContent = json.rekodSediaAda.tarikhHantar;
         document.getElementById("recJustifikasi").textContent = json.rekodSediaAda.justifikasi;
       } else if (json.statusSistem === "TUTUP") {
-        formBox.style.display = "
+        formBox.style.display = "none";
+        subBox.style.display = "none";
+        showAlert("Tempoh pengisian tinjauan telah ditutup.", "info");
+      } else {
+        subBox.style.display = "none";
+        formBox.style.display = "block";
+        document.getElementById("justifikasi").value = "";
+        document.getElementById("chkPengakuan").checked = false;
+      }
+
+      document.getElementById("resultSection").style.display = "block";
+
+    } catch (err) {
+      showAlert("Ralat semasa mendapatkan data. Sila cuba sebentar lagi.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = "🔍 Cari";
+    }
+  }
+
+  async function hantarPermohonan() {
+    hideAlert();
+    if (!currentGuruData) return;
+
+    const justifikasi = document.getElementById("justifikasi").value.trim();
+    const sahCheck = document.getElementById("chkPengakuan").checked;
+
+    if (!justifikasi) {
+      showAlert("Sila isi ruangan Justifikasi Permohonan terlebih dahulu.", "error");
+      document.getElementById("justifikasi").focus();
+      return;
+    }
+
+    if (!sahCheck) {
+      showAlert("Sila tandakan kotak pengakuan sebelum menghantar permohonan.", "error");
+      return;
+    }
+
+    const btnHantar = document.getElementById("btnHantar");
+    btnHantar.disabled = true;
+    btnHantar.textContent = "Sedang Merekodkan...";
+
+    const payload = {
+      ic: currentGuruData.ic,
+      nama: currentGuruData.nama,
+      colE: currentGuruData.colE.value,
+      colF: currentGuruData.colF.value,
+      colG: currentGuruData.colG.value,
+      alamat: currentGuruData.alamat,
+      colBF: currentGuruData.colBF.value,
+      colBG: currentGuruData.colBG.value,
+      colBK: currentGuruData.colBK.value,
+      colCG: currentGuruData.colCG.value,
+      colCI: currentGuruData.colCI.value,
+      colCU: currentGuruData.colCU.value,
+      justifikasi: justifikasi
+    };
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+
+      if (json.success) {
+        document.getElementById("formPengesahan").style.display = "none";
+        const subBox = document.getElementById("alreadySubmittedBox");
+        subBox.style.display = "block";
+        document.getElementById("recNoRujukan").textContent = json.noRujukan;
+        document.getElementById("recTarikh").textContent = new Date().toLocaleString("ms-MY");
+        document.getElementById("recJustifikasi").textContent = justifikasi;
+        showAlert("Terima kasih! Permohonan hasrat pertukaran anda telah berjaya direkodkan.", "success");
+      } else {
+        showAlert(json.message || "Gagal merekodkan permohonan.", "error");
+        btnHantar.disabled = false;
+        btnHantar.textContent = "✔ Sahkan & Rekod Permohonan";
+      }
+    } catch (err) {
+      showAlert("Ralat sambungan semasa menghantar data. Sila cuba lagi.", "error");
+      btnHantar.disabled = false;
+      btnHantar.textContent = "✔ Sahkan & Rekod Permohonan";
+    }
+  }
+</script>
+
+</body>
+</html>
