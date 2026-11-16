@@ -22,7 +22,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg-page); color: var(--text-main); padding: 20px 16px 50px; line-height: 1.5; }
+    body { background-color: var(--bg-page); color: var(--text-main); padding: 20px 16px 40px; line-height: 1.5; }
     .container { max-width: 920px; margin: 0 auto; }
 
     /* Header Rasmi Gaya Portal JPNJ */
@@ -139,7 +139,7 @@
     .badge-found { background: #16a34a; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
 
     .teacher-name { font-size: 1.35rem; font-weight: 800; color: #0f172a; text-transform: uppercase; }
-    .teacher-sub { font-size: 0.95rem; font-weight: 600; color: #1d4ed8; margin-top: 2px; }
+    .teacher-sub { font-size: 0.95rem; font-weight: 700; color: #1d4ed8; margin-top: 4px; }
 
     /* Grid Maklumat 2 Lajur */
     .info-grid {
@@ -237,6 +237,17 @@
     .submitted-banner h4 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; }
     .submitted-banner p { font-size: 0.9rem; margin-bottom: 4px; }
 
+    /* Footer */
+    .footer-rasmi {
+      text-align: center;
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid #cbd5e1;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
     @media (max-width: 640px) {
       .header-banner { flex-direction: column; text-align: center; padding: 20px; }
       .info-grid { grid-template-columns: 1fr; }
@@ -288,49 +299,37 @@
           <span class="badge-gray" id="badgeE">-</span>
         </div>
         <div class="teacher-name" id="dispNama">-</div>
-        <div class="teacher-sub" id="dispF">-</div>
+        <div class="teacher-sub" id="dispSekolahHeader">-</div>
       </div>
       <div>
         <span class="badge-found">✔ Rekod Dijumpai</span>
       </div>
     </div>
 
-    <!-- GRID MAKLUMAT DARI RAWDATA -->
+    <!-- GRID MAKLUMAT DARI RAWDATA (TANPA PENGULANGAN PPD & KOD SEKOLAH) -->
     <div class="info-grid">
       <div class="info-item">
-        <label id="lblE">Maklumat E</label>
-        <div class="val" id="valE">-</div>
-      </div>
-      <div class="info-item">
-        <label id="lblF">Maklumat F</label>
-        <div class="val" id="valF">-</div>
-      </div>
-      <div class="info-item">
-        <label id="lblG">Maklumat G</label>
-        <div class="val" id="valG">-</div>
-      </div>
-      <div class="info-item">
-        <label id="lblBF">Maklumat BF</label>
+        <label id="lblBF">Opsyen 1</label>
         <div class="val" id="valBF">-</div>
       </div>
       <div class="info-item">
-        <label id="lblBG">Maklumat BG</label>
+        <label id="lblBG">Opsyen 2</label>
         <div class="val" id="valBG">-</div>
       </div>
       <div class="info-item">
-        <label id="lblBK">Maklumat BK</label>
+        <label id="lblBK">Opsyen Dominan</label>
         <div class="val" id="valBK">-</div>
       </div>
       <div class="info-item">
-        <label id="lblCG">Maklumat CG</label>
+        <label id="lblCG">Jawatan</label>
         <div class="val" id="valCG">-</div>
       </div>
       <div class="info-item">
-        <label id="lblCI">Maklumat CI</label>
+        <label id="lblCI">Gred Hakiki</label>
         <div class="val" id="valCI">-</div>
       </div>
-      <div class="info-item full-width">
-        <label id="lblCU">Maklumat CU</label>
+      <div class="info-item">
+        <label id="lblCU">Tarikh Khidmat Sekolah Semasa</label>
         <div class="val" id="valCU">-</div>
       </div>
       <div class="info-item full-width">
@@ -363,6 +362,11 @@
       <p><strong>Justifikasi Direkodkan:</strong> <span id="recJustifikasi">-</span></p>
     </div>
   </div>
+
+  <!-- FOOTER RASMI -->
+  <footer class="footer-rasmi">
+    Hak Cipta Terpelihara &copy; Jabatan Pendidikan Negeri Johor | Sektor Pengurusan Sekolah (Unit Prasekolah dan Rendah - SJKC) — Untuk Kegunaan Dalaman Sahaja
+  </footer>
 </div>
 
 <script>
@@ -371,7 +375,6 @@
   let currentGuruData = null;
   let sistemStatus = "BUKA";
 
-  // Semak status sistem semasa halaman dibuka
   window.addEventListener("DOMContentLoaded", async () => {
     try {
       const res = await fetch(`${SCRIPT_URL}?action=semakStatusSistem`);
@@ -393,178 +396,5 @@
     }
   });
 
-  // Benarkan tekan Enter di kotak IC
   document.getElementById("inputIC").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") cariGuru();
-  });
-
-  function showAlert(msg, type) {
-    const box = document.getElementById("alertBox");
-    box.className = `alert alert-${type}`;
-    box.textContent = msg;
-    box.style.display = "block";
-  }
-
-  function hideAlert() {
-    document.getElementById("alertBox").style.display = "none";
-  }
-
-  async function cariGuru() {
-    hideAlert();
-    const icVal = document.getElementById("inputIC").value.replace(/[^0-9]/g, '');
-    if (icVal.length !== 12) {
-      showAlert("Sila masukkan 12 digit No. Kad Pengenalan yang sah.", "error");
-      return;
-    }
-
-    const btn = document.getElementById("btnCari");
-    btn.disabled = true;
-    btn.textContent = "Mencari...";
-    document.getElementById("resultSection").style.display = "none";
-
-    try {
-      const res = await fetch(`${SCRIPT_URL}?action=cariIC&ic=${icVal}`);
-      const json = await res.json();
-
-      if (!json.success) {
-        showAlert(json.message || "Rekod tidak dijumpai.", "error");
-        return;
-      }
-
-      const d = json.data;
-      currentGuruData = d;
-
-      // Isi maklumat ke dalam kad
-      document.getElementById("badgeIC").textContent = d.ic;
-      document.getElementById("badgeE").textContent = d.colE.value;
-      document.getElementById("dispNama").textContent = d.nama;
-      document.getElementById("dispF").textContent = d.colF.value;
-
-      document.getElementById("lblE").textContent = d.colE.label;
-      document.getElementById("valE").textContent = d.colE.value;
-
-      document.getElementById("lblF").textContent = d.colF.label;
-      document.getElementById("valF").textContent = d.colF.value;
-
-      document.getElementById("lblG").textContent = d.colG.label;
-      document.getElementById("valG").textContent = d.colG.value;
-
-      document.getElementById("lblBF").textContent = d.colBF.label;
-      document.getElementById("valBF").textContent = d.colBF.value;
-
-      document.getElementById("lblBG").textContent = d.colBG.label;
-      document.getElementById("valBG").textContent = d.colBG.value;
-
-      document.getElementById("lblBK").textContent = d.colBK.label;
-      document.getElementById("valBK").textContent = d.colBK.value;
-
-      document.getElementById("lblCG").textContent = d.colCG.label;
-      document.getElementById("valCG").textContent = d.colCG.value;
-
-      document.getElementById("lblCI").textContent = d.colCI.label;
-      document.getElementById("valCI").textContent = d.colCI.value;
-
-      document.getElementById("lblCU").textContent = d.colCU.label;
-      document.getElementById("valCU").textContent = d.colCU.value;
-
-      document.getElementById("valAlamat").textContent = d.alamat;
-
-      // Semak sama ada sudah menghantar atau sistem ditutup
-      const formBox = document.getElementById("formPengesahan");
-      const subBox = document.getElementById("alreadySubmittedBox");
-
-      if (json.sudahHantar && json.rekodSediaAda) {
-        formBox.style.display = "none";
-        subBox.style.display = "block";
-        document.getElementById("recNoRujukan").textContent = json.rekodSediaAda.noRujukan;
-        document.getElementById("recTarikh").textContent = json.rekodSediaAda.tarikhHantar;
-        document.getElementById("recJustifikasi").textContent = json.rekodSediaAda.justifikasi;
-      } else if (json.statusSistem === "TUTUP") {
-        formBox.style.display = "none";
-        subBox.style.display = "none";
-        showAlert("Tempoh pengisian tinjauan telah ditutup.", "info");
-      } else {
-        subBox.style.display = "none";
-        formBox.style.display = "block";
-        document.getElementById("justifikasi").value = "";
-        document.getElementById("chkPengakuan").checked = false;
-      }
-
-      document.getElementById("resultSection").style.display = "block";
-
-    } catch (err) {
-      showAlert("Ralat semasa mendapatkan data. Sila cuba sebentar lagi.", "error");
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = "🔍 Cari";
-    }
-  }
-
-  async function hantarPermohonan() {
-    hideAlert();
-    if (!currentGuruData) return;
-
-    const justifikasi = document.getElementById("justifikasi").value.trim();
-    const sahCheck = document.getElementById("chkPengakuan").checked;
-
-    if (!justifikasi) {
-      showAlert("Sila isi ruangan Justifikasi Permohonan terlebih dahulu.", "error");
-      document.getElementById("justifikasi").focus();
-      return;
-    }
-
-    if (!sahCheck) {
-      showAlert("Sila tandakan kotak pengakuan sebelum menghantar permohonan.", "error");
-      return;
-    }
-
-    const btnHantar = document.getElementById("btnHantar");
-    btnHantar.disabled = true;
-    btnHantar.textContent = "Sedang Merekodkan...";
-
-    const payload = {
-      ic: currentGuruData.ic,
-      nama: currentGuruData.nama,
-      colE: currentGuruData.colE.value,
-      colF: currentGuruData.colF.value,
-      colG: currentGuruData.colG.value,
-      alamat: currentGuruData.alamat,
-      colBF: currentGuruData.colBF.value,
-      colBG: currentGuruData.colBG.value,
-      colBK: currentGuruData.colBK.value,
-      colCG: currentGuruData.colCG.value,
-      colCI: currentGuruData.colCI.value,
-      colCU: currentGuruData.colCU.value,
-      justifikasi: justifikasi
-    };
-
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      const json = await res.json();
-
-      if (json.success) {
-        document.getElementById("formPengesahan").style.display = "none";
-        const subBox = document.getElementById("alreadySubmittedBox");
-        subBox.style.display = "block";
-        document.getElementById("recNoRujukan").textContent = json.noRujukan;
-        document.getElementById("recTarikh").textContent = new Date().toLocaleString("ms-MY");
-        document.getElementById("recJustifikasi").textContent = justifikasi;
-        showAlert("Terima kasih! Permohonan hasrat pertukaran anda telah berjaya direkodkan.", "success");
-      } else {
-        showAlert(json.message || "Gagal merekodkan permohonan.", "error");
-        btnHantar.disabled = false;
-        btnHantar.textContent = "✔ Sahkan & Rekod Permohonan";
-      }
-    } catch (err) {
-      showAlert("Ralat sambungan semasa menghantar data. Sila cuba lagi.", "error");
-      btnHantar.disabled = false;
-      btnHantar.textContent = "✔ Sahkan & Rekod Permohonan";
-    }
-  }
-</script>
-
-</body>
-</html>
+    if (e.key === "Enter")
